@@ -1,0 +1,30 @@
+{
+  "name": "decatron-gt",
+  "version": "1.0.0",
+  "description": "A smart Gather Town bot that plays music and does other cool stuff",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joesekai/decatron.git"
+  },
+  "author": "joesekai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joesekai/decatron/issues"
+  },
+  "homepage": "https://github.com/joesekai/decatron#readme",
+  "dependencies": {
+    "@gathertown/gather-game-client": "^37.0.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.13.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.2"
+  }
+}
