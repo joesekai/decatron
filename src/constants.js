@@ -1,4 +1,4 @@
-const BOT_NAME = 'Andy(Bot)';
+const BOT_NAME = 'Decatron (Autobot)';
 const BOT_INFO = {
   name: BOT_NAME,
   avatar: 1,
