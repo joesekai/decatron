@@ -1,4 +1,5 @@
 const { entries } = require('lodash');
+const { MAPS, MAP_COORDINATES } = require('./constants');
 
 function getPlayerId(game, playerName, extractContext = false) {
   const playersList = game.players;
@@ -13,12 +14,18 @@ function getPlayerId(game, playerName, extractContext = false) {
 
 function teleport(game, playerName, destination) {
   const playerToTeleport = getPlayerId(game, playerName);
-  const destinationCoords = getPlayerId(game, destination, true);
+
+  let destinationLocation;
+  if (MAPS.includes(destination)) {
+    destinationLocation = MAP_COORDINATES[destination.toUpperCase()];
+  } else {
+    destinationLocation = getPlayerId(game, destination, true);
+  }
 
   game.teleport(
-    destinationCoords.map,
-    destinationCoords.x + 1,
-    destinationCoords.y + 1,
+    destinationLocation.map,
+    destinationLocation.x + 1,
+    destinationLocation.y + 1,
     playerToTeleport
   );
 }

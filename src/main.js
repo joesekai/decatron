@@ -3,7 +3,7 @@ const { Game } = require('@gathertown/gather-game-client');
 const http = require('http');
 const { isEmpty, entries } = require('lodash');
 const { API_KEY, SPACE_ID } = require('./config');
-const { BOT_NAME, BOT_INFO } = require('./constants');
+const { BOT_NAME, BOT_INFO, MAPS } = require('./constants');
 const { teleport } = require('./utils');
 
 global.WebSocket = require('isomorphic-ws');
@@ -70,7 +70,7 @@ server.listen(process.env.PORT || 80, () => {
         }
         case '/teleport': {
           if (!flags.length) {
-            game.chat('LOCAL_CHAT', [`${message.senderId}`], 'office-outdoor', {
+            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
               contents: `Invalid command! Kindly use the proper syntax:\n\n /teleport <player> <map | player>`,
             });
 
@@ -81,7 +81,7 @@ server.listen(process.env.PORT || 80, () => {
           const destination = flags[1];
 
           if (!playerName || !destination) {
-            game.chat('LOCAL_CHAT', [`${message.senderId}`], 'office-outdoor', {
+            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
               contents: `Invalid command! Kindly use the proper syntax:\n\n /teleport <player> <map | player>`,
             });
 
@@ -92,17 +92,29 @@ server.listen(process.env.PORT || 80, () => {
 
           break;
         }
-        case '/showPlayers': {
-          const playersList = game.players;
-          const playersInSpace = entries(playersList)
-            .map(([, playerInfo], index) => {
-              return `${index + 1}. ${playerInfo.name}`;
-            })
-            .join('\n');
+        case '/show': {
+          if (flags[0] === '-p') {
+            const playersList = game.players;
+            const playersInSpace = entries(playersList)
+              .map(([, playerInfo], index) => {
+                return `${index + 1}. ${playerInfo.name}`;
+              })
+              .join('\n');
 
-          game.chat('LOCAL_CHAT', [`${message.senderId}`], 'office-outdoor', {
-            contents: `List of Members:\n\n ${playersInSpace}`,
-          });
+            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
+              contents: `List of Players:\n\n ${playersInSpace}`,
+            });
+
+            return;
+          }
+
+          if (flags[0] === '-m') {
+            const mapsInSpace = MAPS.map((map, index) => `${index + 1}. ${map}`).join('\n');
+
+            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
+              contents: `List of Maps:\n\n ${mapsInSpace}`,
+            });
+          }
 
           break;
         }
