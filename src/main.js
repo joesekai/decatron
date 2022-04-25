@@ -67,6 +67,7 @@ server.listen(process.env.PORT || 80, () => {
           game.exit();
           break;
         }
+        case '/t':
         case '/teleport': {
           if (!flags.length) {
             game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
