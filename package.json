@@ -2,10 +2,10 @@
   "name": "decatron-gt",
   "version": "1.0.0",
   "description": "A smart Gather Town bot that plays music and does other cool stuff",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon .",
+    "start": "node ."
   },
   "repository": {
     "type": "git",
