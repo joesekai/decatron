@@ -4,7 +4,7 @@
   "description": "A smart Gather Town bot that plays music and does other cool stuff",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,12 @@
   },
   "homepage": "https://github.com/joesekai/decatron#readme",
   "dependencies": {
-    "@gathertown/gather-game-client": "^37.0.1"
+    "@gathertown/gather-game-client": "^37.0.1",
+    "dotenv": "^16.0.0",
+    "isomorphic-ws": "^4.0.1",
+    "lodash": "^4.17.21",
+    "puppeteer": "^13.6.0",
+    "ws": "^8.5.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
@@ -25,6 +30,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "nodemon": "^2.0.15",
     "prettier": "^2.6.2"
   }
 }
