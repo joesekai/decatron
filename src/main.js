@@ -77,8 +77,12 @@ server.listen(process.env.PORT || 80, () => {
             return;
           }
 
-          const playerName = flags[0];
-          const destination = flags[1];
+          let playerName = context.player.name;
+          let destination = flags[0];
+
+          if (flags.length > 1) {
+            [playerName, destination] = flags;
+          }
 
           if (!playerName || !destination) {
             game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
