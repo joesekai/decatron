@@ -1,4 +1,4 @@
-const { entries } = require('lodash');
+const { entries, capitalize, toUpper } = require('lodash');
 const { MAPS, MAP_COORDINATES } = require('./constants');
 
 function getPlayerId(game, playerName, extractContext = false) {
@@ -21,8 +21,8 @@ function teleport(game, playerName, destination) {
   const playerToTeleport = getPlayerId(game, playerName);
 
   let destinationLocation;
-  if (MAPS.includes(destination)) {
-    destinationLocation = MAP_COORDINATES[destination.toUpperCase()];
+  if (MAPS.includes(capitalize(destination))) {
+    destinationLocation = MAP_COORDINATES[toUpper(destination)];
   } else {
     destinationLocation = getPlayerId(game, destination, true);
   }
