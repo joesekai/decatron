@@ -11,7 +11,6 @@ global.WebSocket = require('isomorphic-ws');
 const server = http.createServer(() => {});
 
 server.listen(process.env.PORT || 80, () => {
-  console.log('Listening on port 80');
   const game = new Game(SPACE_ID, () => Promise.resolve({ apiKey: API_KEY }));
   game.connect();
   game.subscribeToConnection((connected) => console.log('connected to server?', connected));
