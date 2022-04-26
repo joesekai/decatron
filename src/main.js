@@ -52,6 +52,13 @@ server.listen(process.env.PORT || 80, () => {
           game.exit();
           break;
         }
+        case '/sing': {
+          game.chat('GLOBAL_CHAT', [], context.player.map, {
+            contents: `La La La La....🎵🎵`,
+          });
+          game.exit();
+          break;
+        }
         default: {
           game.chat('GLOBAL_CHAT', [], context.player.map, {
             contents: `Kindly send this command directly to ${BOT_NAME} via Direct Message`,
