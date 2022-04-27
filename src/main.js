@@ -3,18 +3,20 @@
  *
  * A GatherTown bot with lot of smart tricks up its' pocket
  */
+
 const { Game } = require('@gathertown/gather-game-client');
-const http = require('http');
 const { isEmpty, entries } = require('lodash');
-const { API_KEY, SPACE_ID } = require('./config');
+const express = require('express');
+
+const { API_KEY, SPACE_ID, PORT } = require('./config');
 const { BOT_NAME, BOT_INFO, MAPS } = require('./constants');
 const { teleport } = require('./utils');
 
 global.WebSocket = require('isomorphic-ws');
 
-const server = http.createServer(() => {});
+const app = express();
 
-server.listen(process.env.PORT || 80, () => {
+function main() {
   const game = new Game(SPACE_ID, () => Promise.resolve({ apiKey: API_KEY }));
   game.connect();
   game.subscribeToConnection((connected) => console.log('connected to server?', connected));
@@ -139,4 +141,9 @@ server.listen(process.env.PORT || 80, () => {
       }
     }
   });
+}
+
+app.listen(PORT, () => {
+  console.log(`Server has started on port ${PORT}`);
+  main();
 });
