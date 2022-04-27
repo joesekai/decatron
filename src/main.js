@@ -4,146 +4,112 @@
  * A GatherTown bot with lot of smart tricks up its' pocket
  */
 
-const { Game } = require('@gathertown/gather-game-client');
-const { isEmpty, entries } = require('lodash');
-const express = require('express');
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
 
-const { API_KEY, SPACE_ID, PORT } = require('./config');
-const { BOT_NAME, BOT_INFO, MAPS } = require('./constants');
-const { teleport } = require('./utils');
+const { Game } = require('@gathertown/gather-game-client');
+const { entries } = require('lodash');
+const express = require('express');
+const fs = require('fs');
+
+const { API_KEY, SPACE_ID, PORT, COMMAND_PREFIX } = require('./config');
+const { sendChat } = require('./utils');
 
 global.WebSocket = require('isomorphic-ws');
 
 const app = express();
+
+function initializeCommands() {
+  const commands = new Map();
+
+  const commandFolders = fs.readdirSync('./src/commands');
+
+  const commandFiles = commandFolders.reduce((acc, folder) => {
+    fs.readdirSync(`./src/commands/${folder}`).forEach((file) => {
+      if (file.endsWith('.js')) {
+        // eslint-disable-next-line no-param-reassign
+        acc = { ...acc, [folder]: [...(acc[folder] || []), file] };
+      }
+    });
+
+    return acc;
+  }, {});
+
+  entries(commandFiles).forEach(([folder, files]) => {
+    files.forEach((file) => {
+      const command = require(`./commands/${folder}/${file}`);
+      commands.set(command.name, command);
+    });
+  });
+
+  return commands;
+}
 
 function main() {
   const game = new Game(SPACE_ID, () => Promise.resolve({ apiKey: API_KEY }));
   game.connect();
   game.subscribeToConnection((connected) => console.log('connected to server?', connected));
 
+  const commands = initializeCommands();
+
   game.subscribeToEvent('playerChats', (data, context) => {
     const message = data.playerChats;
 
-    if (!message.contents.startsWith('/')) {
+    if (!message.contents.startsWith(COMMAND_PREFIX)) return;
+
+    let recipient = message.messageType || message.recipient;
+
+    // The bot cannot reply back in DM, so if the player messages the bot in DM, the bot will reply
+    // back in the LOCAL_CHAT
+    if (recipient === 'DM') recipient = 'LOCAL_CHAT';
+
+    if (!context.player.isSignedIn) {
+      sendChat({
+        game,
+        recipient,
+        context,
+        message: "I don't listen to people who don't sign in, pfft",
+      });
+
       return;
     }
 
-    if (message.recipient === 'GLOBAL_CHAT') {
-      switch (message.contents.toLocaleLowerCase()) {
-        case '/join': {
-          const isBotActive = !isEmpty(
-            game.filterPlayersInSpace((player) => player.name === BOT_NAME)
-          );
+    const args = message.contents.substring(COMMAND_PREFIX.length).trim().split(/ +/);
+    const commandName = args.shift().toLowerCase();
 
-          if (!isBotActive) {
-            game.enter(BOT_INFO);
-            setTimeout(() => teleport(game, BOT_NAME, context.player.name), 1000);
+    if (!commands.has(commandName)) return;
 
-            game.chat('GLOBAL_CHAT', [], context.player.map, {
-              contents: `Hey it's me - ${BOT_NAME}! How can I help you?`,
-            });
-            return;
-          }
+    const command = commands.get(commandName);
 
-          game.chat('GLOBAL_CHAT', [], context.player.map, {
-            contents: `${BOT_NAME} has already joined the space. Kindly use the teleport command to teleport to ${BOT_NAME}`,
-          });
+    if (command.args && !args.length) {
+      let reply = `You didn't provide any arguments, ${context.player.name}!`;
 
-          break;
-        }
-        case '/leave': {
-          game.chat('GLOBAL_CHAT', [], context.player.map, {
-            contents: `It was nice to meet you! Toodles!`,
-          });
-          game.exit();
-          break;
-        }
-        case '/sing': {
-          game.chat('GLOBAL_CHAT', [], context.player.map, {
-            contents: `La La La La....🎵🎵`,
-          });
-          game.exit();
-          break;
-        }
-        default: {
-          game.chat('GLOBAL_CHAT', [], context.player.map, {
-            contents: `Kindly send this command directly to ${BOT_NAME} via Direct Message`,
-          });
-          break;
-        }
+      if (command.usage) {
+        reply += `\nThe proper usage would be: \`${COMMAND_PREFIX}${command.name} ${command.usage}\``;
       }
-    } else if (message.messageType === 'DM') {
-      const [command, ...flags] = message.contents.split(' ');
 
-      switch (command) {
-        case '/leave': {
-          game.exit();
-          break;
-        }
-        case '/t':
-        case '/teleport': {
-          if (!flags.length) {
-            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
-              contents: `Invalid command! Kindly use the proper syntax:\n\n /teleport <player> <map | player>`,
-            });
+      sendChat({ game, recipient, context, message: reply });
 
-            return;
-          }
+      return;
+    }
 
-          let playerName = context.player.name;
-          let destination = flags[0];
-
-          if (flags.length > 1) {
-            [playerName, destination] = flags;
-          }
-
-          if (!playerName || !destination) {
-            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
-              contents: `Invalid command! Kindly use the proper syntax:\n\n /teleport <player> <map | player>`,
-            });
-
-            return;
-          }
-
-          teleport(game, playerName, destination);
-
-          break;
-        }
-        case '/show': {
-          if (flags[0] === '-p') {
-            const playersList = game.players;
-            const playersInSpace = entries(playersList)
-              .map(([, playerInfo], index) => {
-                return `${index + 1}. ${playerInfo.name}`;
-              })
-              .join('\n');
-
-            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
-              contents: `List of Players:\n\n ${playersInSpace}`,
-            });
-
-            return;
-          }
-
-          if (flags[0] === '-m') {
-            const mapsInSpace = MAPS.map((map, index) => `${index + 1}. ${map}`).join('\n');
-
-            game.chat('LOCAL_CHAT', [`${message.senderId}`], context.player.map, {
-              contents: `List of Maps:\n\n ${mapsInSpace}`,
-            });
-          }
-
-          break;
-        }
-        default: {
-          game.notify('Invalid Command');
-        }
-      }
+    try {
+      command.execute({ game, recipient, context, args });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      sendChat({
+        game,
+        recipient,
+        context,
+        message: 'There was an error in executing that command',
+      });
     }
   });
 }
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server has started on port ${PORT}`);
   main();
 });

@@ -8,9 +8,7 @@ const BOT_INFO = {
   isNpc: true,
 };
 
-const MAPS = ['Bonfire', 'Beach', 'Shack', 'Area51', 'Cafe', 'Office', 'Arcade', 'Auditorium'];
-
-const MAP_COORDINATES = {
+const LOCATIONS = {
   BONFIRE: {
     map: 'office-outdoor',
     x: 16,
@@ -56,6 +54,5 @@ const MAP_COORDINATES = {
 module.exports = {
   BOT_NAME,
   BOT_INFO,
-  MAPS,
-  MAP_COORDINATES,
+  LOCATIONS,
 };
