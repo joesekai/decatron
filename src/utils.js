@@ -1,43 +1,50 @@
-const { entries, capitalize, toUpper } = require('lodash');
-const { MAPS, MAP_COORDINATES } = require('./constants');
+const { entries, toUpper, keys } = require('lodash');
+const { LOCATIONS } = require('./constants');
 
-function getPlayerId(game, playerName, extractContext = false) {
-  try {
-    const playersList = game.players;
-    const playerInfo = entries(playersList).find(([, player]) => player.name.includes(playerName));
+function getPlayerInfo(game, playerName) {
+  const playerObj = game.filterPlayersInSpace((player) => player.name.includes(playerName));
 
-    if (extractContext) {
-      return playerInfo[1];
-    }
+  if (!playerObj.length) return null;
 
-    return playerInfo[0];
-  } catch (error) {
-    game.notify('Invalid Destination');
-    return null;
-  }
+  return playerObj[0];
+}
+
+function getPlayerId(game, playerName) {
+  const playersList = game.players;
+  const playerInfo = entries(playersList).find(([, player]) => player.name.includes(playerName));
+
+  return playerInfo[0];
+}
+
+function sendChat({ game, recipient, context, message }) {
+  const senderId = getPlayerId(game, context.player.name);
+
+  game.chat(recipient, [senderId], context.player.map, {
+    contents: message,
+  });
 }
 
 function teleport(game, playerName, destination) {
-  const playerToTeleport = getPlayerId(game, playerName);
+  const playerId = getPlayerId(game, playerName);
+  const $destination = toUpper(destination);
 
-  let destinationLocation;
-  if (MAPS.includes(capitalize(destination))) {
-    destinationLocation = MAP_COORDINATES[toUpper(destination)];
+  let destinationInfo;
+  if (keys(LOCATIONS).includes($destination)) {
+    destinationInfo = LOCATIONS[$destination];
   } else {
-    destinationLocation = getPlayerId(game, destination, true);
+    destinationInfo = getPlayerInfo(game, destination);
   }
 
-  if (destinationLocation) {
-    game.teleport(
-      destinationLocation.map,
-      destinationLocation.x + 1,
-      destinationLocation.y + 1,
-      playerToTeleport
-    );
+  if (destinationInfo) {
+    game.teleport(destinationInfo.map, destinationInfo.x + 1, destinationInfo.y + 1, playerId);
+  } else {
+    throw new Error('Destination not found');
   }
 }
 
 module.exports = {
   teleport,
   getPlayerId,
+  getPlayerInfo,
+  sendChat,
 };
