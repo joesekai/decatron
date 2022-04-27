@@ -19,6 +19,10 @@ global.WebSocket = require('isomorphic-ws');
 
 const app = express();
 
+app.get('/', (req, res) => {
+  res.send('I got my caffeine shot! ☕');
+});
+
 function initializeCommands() {
   const commands = new Map();
 
