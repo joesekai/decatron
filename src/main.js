@@ -1,4 +1,8 @@
-/* eslint-disable no-console */
+/**
+ * @file
+ *
+ * A GatherTown bot with lot of smart tricks up its' pocket
+ */
 const { Game } = require('@gathertown/gather-game-client');
 const http = require('http');
 const { isEmpty, entries } = require('lodash');
