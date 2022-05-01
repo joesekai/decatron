@@ -1,4 +1,6 @@
 const { values } = require('lodash');
+const store = require('store');
+
 const { YOUTUBE_PROXY_URL } = require('../../config');
 const { BOT_INFO } = require('../../constants');
 const { sendChat, findDistance } = require('../../utils');
@@ -32,11 +34,13 @@ module.exports = {
       sound: {
         src,
         volume: 1.0, // 0.0 to 1.0
-        maxDistance: 15, // range in tiles you can hear it from
+        maxDistance: 100, // range in tiles you can hear it from
         loop: false, // if false, will play once when people enter the map, even if out of range
       },
     });
 
-    sendChat({ game, recipient, context, message: 'Playing music' });
+    store.set('musicObject', { id: closestObjectToBot[0], src });
+
+    sendChat({ game, recipient, context, message: `Playing music on ${closestObjectToBot[0]}` });
   },
 };

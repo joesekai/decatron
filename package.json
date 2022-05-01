@@ -24,6 +24,7 @@
     "isomorphic-ws": "^4.0.1",
     "lodash": "^4.17.21",
     "puppeteer": "^13.6.0",
+    "store": "^2.0.12",
     "ws": "^8.5.0"
   },
   "devDependencies": {
