@@ -4,6 +4,7 @@ module.exports = {
   name: 'teleport',
   description: `Teleports players to the desired location`,
   args: true,
+  botCommand: true,
   usage: '<player> <map | player>',
   execute({ game, recipient, context, args }) {
     let playerName = context.player.name;

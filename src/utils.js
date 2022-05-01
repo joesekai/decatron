@@ -13,6 +13,8 @@ function getPlayerId(game, playerName) {
   const playersList = game.players;
   const playerInfo = entries(playersList).find(([, player]) => player.name.includes(playerName));
 
+  if (!playerInfo) return null;
+
   return playerInfo[0];
 }
 
@@ -42,9 +44,19 @@ function teleport(game, playerName, destination) {
   }
 }
 
+function generateRandomNumber(limit) {
+  return Math.ceil(Math.random() * limit);
+}
+
+function findDistance(point1, point2) {
+  return Math.sqrt((point2.x - point1.x, 2) ** 2 + (point2.y - point1.y) ** 2);
+}
+
 module.exports = {
   teleport,
   getPlayerId,
   getPlayerInfo,
   sendChat,
+  generateRandomNumber,
+  findDistance,
 };

@@ -6,6 +6,7 @@ module.exports = {
   name: 'show-locations',
   description: `Shows the list of all the available locations in the space`,
   args: false,
+  botCommand: true,
   usage: 'x',
   execute({ game, recipient, context, args }) {
     const locationsInSpace = keys(LOCATIONS)

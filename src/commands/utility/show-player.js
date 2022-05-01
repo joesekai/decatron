@@ -5,6 +5,7 @@ module.exports = {
   name: 'show-players',
   description: `Shows the list of all the players present in the space`,
   args: false,
+  botCommand: true,
   usage: '',
   execute({ game, recipient, context, args }) {
     const playersList = game.players;
