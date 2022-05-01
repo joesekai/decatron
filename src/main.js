@@ -13,7 +13,8 @@ const express = require('express');
 const fs = require('fs');
 
 const { API_KEY, SPACE_ID, PORT, COMMAND_PREFIX } = require('./config');
-const { sendChat } = require('./utils');
+const { sendChat, getPlayerInfo } = require('./utils');
+const { BOT_INFO } = require('./constants');
 
 global.WebSocket = require('isomorphic-ws');
 
@@ -84,6 +85,21 @@ function main() {
     if (!commands.has(commandName)) return;
 
     const command = commands.get(commandName);
+
+    if (command.botCommand) {
+      const isBotInSpace = !!getPlayerInfo(game, BOT_INFO.name);
+
+      if (!isBotInSpace) {
+        sendChat({
+          game,
+          recipient,
+          context,
+          message: `${BOT_INFO.name} is not present in the space. Use the !join command to make ${BOT_INFO.name} join the space before using other commands`,
+        });
+
+        return;
+      }
+    }
 
     if (command.args && !args.length) {
       let reply = `You didn't provide any arguments, ${context.player.name}!`;
