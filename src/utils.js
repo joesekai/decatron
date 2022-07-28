@@ -24,6 +24,25 @@ function sendChat({ game, recipient, context, message }) {
   });
 }
 
+function teleportAll(game, destination) {
+  const $destination = toUpper(destination);
+
+  let destinationInfo;
+  if (keys(LOCATIONS).includes($destination)) {
+    destinationInfo = LOCATIONS[$destination];
+  } else {
+    destinationInfo = getPlayerInfo(game, destination);
+  }
+
+  if (!destinationInfo) {
+    throw new Error('Destination not found');
+  }
+
+  entries(game.players).forEach(([id]) => {
+    game.teleport(destinationInfo.map, destinationInfo.x + 1, destinationInfo.y + 1, id);
+  });
+}
+
 function teleport(game, playerName, destination) {
   const playerId = getPlayerId(game, playerName);
   const $destination = toUpper(destination);
@@ -44,6 +63,7 @@ function teleport(game, playerName, destination) {
 
 module.exports = {
   teleport,
+  teleportAll,
   getPlayerId,
   getPlayerInfo,
   sendChat,

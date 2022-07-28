@@ -1,4 +1,5 @@
-const { teleport, sendChat } = require('../../utils');
+const { toLower } = require('lodash');
+const { teleport, sendChat, teleportAll } = require('../../utils');
 
 module.exports = {
   name: 'teleport',
@@ -12,14 +13,21 @@ module.exports = {
     if (args.length > 1) {
       [playerName, destination] = args;
     }
+    const shouldTeleportAll = toLower(playerName) === 'all';
 
-    teleport(game, playerName, destination);
+    if (shouldTeleportAll) {
+      teleportAll(game, destination);
+    } else {
+      teleport(game, playerName, destination);
+    }
 
     sendChat({
       game,
       recipient,
       context,
-      message: `${playerName} was teleported to ${destination}`,
+      message: shouldTeleportAll
+        ? `Everyone was teleported to ${destination}`
+        : `${playerName} was teleported to ${destination}`,
     });
   },
 };
