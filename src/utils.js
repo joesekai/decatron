@@ -13,6 +13,10 @@ function getPlayerId(game, playerName) {
   const playersList = game.players;
   const playerInfo = entries(playersList).find(([, player]) => player.name.includes(playerName));
 
+  if (!playerInfo) {
+    return null;
+  }
+
   return playerInfo[0];
 }
 

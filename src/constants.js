@@ -8,6 +8,8 @@ const BOT_INFO = {
   isNpc: true,
 };
 
+const TEAM_NAMES = ['Gryffindor', 'Ravenclaw', 'Hufflepuff', 'Slytherin'];
+
 const LOCATIONS = {
   BONFIRE: {
     map: 'office-outdoor',
@@ -55,4 +57,5 @@ module.exports = {
   BOT_NAME,
   BOT_INFO,
   LOCATIONS,
+  TEAM_NAMES,
 };
